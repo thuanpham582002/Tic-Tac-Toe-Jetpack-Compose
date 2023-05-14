@@ -1,8 +1,10 @@
 package dev.keego.tictactoe
 
+import android.util.Log
+
 object Minimax {
-    fun minMaxDecision(state: State): Int {
-        val possibleMoves: ArrayList<State> = successorsOf(state)
+    fun minMaxDecisionModeEasy(boardState: BoardState): Int {
+        val possibleMoves: ArrayList<BoardState> = successorsOf(boardState)
         val movesList = ArrayList<Int>()
         for (states in possibleMoves) {
             movesList.add(minValue(states))
@@ -18,44 +20,106 @@ object Minimax {
         println(possibleMoves)
         println(movesList)
         val action = possibleMoves[bestIndex].position
-        println("Action: $action")
+
+        Log.i("Minimax", possibleMoves.toString())
+        Log.i("Minimax", movesList.toString())
+//        val action = possibleMoves[bestIndex].position
+        Log.i("Minimax", "Action: $action")
         return action
     }
 
+    fun minMaxDecisionModeHard(boardState: BoardState): Int {
+        val possibleMoves: ArrayList<BoardState> = successorsOf(boardState)
+        val movesList = ArrayList<Int>()
+        for (states in possibleMoves) {
+            movesList.add(minimax(states, 0, false))
+        }
+        var max = movesList[0]
+        var bestIndex = 0
+        for (i in 1 until movesList.size) {
+            if (movesList[i] > max) {
+                max = movesList[i]
+                bestIndex = i
+            }
+        }
+        println(possibleMoves)
+        println(movesList)
+        val action = possibleMoves[bestIndex].position
+
+        Log.i("Minimax", possibleMoves.toString())
+        Log.i("Minimax", movesList.toString())
+//        val action = possibleMoves[bestIndex].position
+        Log.i("Minimax", "Action: $action")
+        return action
+//        return 0
+    }
+
+    fun minimax(boardState: BoardState, depth: Int, isMaximizingPlayer: Boolean): Int {
+        if (isTerminal(boardState)) {
+            val score = utilityOf(boardState)
+            if (score == 10) {
+                Log.i("X winn", "minimax: $score - $depth $isMaximizingPlayer")
+                return score - depth
+            } else if (score == -10) {
+                Log.i("O win", "minimax: $score + $depth $isMaximizingPlayer")
+                return score + depth
+            }
+            return score
+        }
+        if (isMaximizingPlayer) {
+            var bestValue = -1000
+            for (possibleMove in successorsOf(boardState)) {
+                val value = minimax(possibleMove, depth + 1, false)
+                bestValue = Math.max(bestValue, value)
+                Log.i("Max value", "minimax: $value $bestValue + $depth $isMaximizingPlayer")
+            }
+            return bestValue
+        } else {
+            var bestValue = 1000
+            for (possibleMove in successorsOf(boardState)) {
+                val value = minimax(possibleMove, depth + 1, true)
+                bestValue = Math.min(bestValue, value)
+                Log.i("Min value", "minimax: $value $bestValue + $depth $isMaximizingPlayer")
+
+            }
+            return bestValue
+        }
+    }
+
     //Picks best option for the X-player
-    private fun maxValue(state: State): Int {
-        if (isTerminal(state)) {
-            return utilityOf(state)
+    private fun maxValue(boardState: BoardState): Int {
+        if (isTerminal(boardState)) {
+            return utilityOf(boardState)
         }
         var v = (-Double.POSITIVE_INFINITY).toInt()
-        for (possibleMove in successorsOf(state)) {
+        for (possibleMove in successorsOf(boardState)) {
             v = Math.max(v, minValue(possibleMove))
         }
-        println(v)
+        Log.i("Minimax Max", v.toString())
         return v
     }
 
     //Picks best option for the O-player
-    private fun minValue(state: State): Int {
-        if (isTerminal(state)) {
-            return utilityOf(state)
+    private fun minValue(boardState: BoardState): Int {
+        if (isTerminal(boardState)) {
+            return utilityOf(boardState)
         }
         var v = Double.POSITIVE_INFINITY.toInt()
-        for (possibleMove in successorsOf(state)) {
+        for (possibleMove in successorsOf(boardState)) {
             v = Math.min(v, maxValue(possibleMove))
         }
-        println(v)
+        Log.i("Minimax Min", v.toString())
         return v
     }
 
     //Returns true if the game is over
-    fun isTerminal(state: State): Boolean {
+    fun isTerminal(boardState: BoardState): Boolean {
         var takenSpots = 0
         for (a in 0..8) {
-            if (state.getStateIndex(a) == "X" || state.getStateIndex(a) == "O") {
+            if (boardState.getStateIndex(a) == "X" || boardState.getStateIndex(a) == "O") {
                 takenSpots++
             }
-            val line = checkState(state, a)
+            val line = checkState(boardState, a)
 
             //Check for Winners
             if (line == "XXX") {
@@ -71,52 +135,75 @@ object Minimax {
     }
 
     //Returns +1 if X is winner
-    //Return -1 if O is winner
-    //Returns 0 if no one won
-    private fun utilityOf(state: State): Int {
+//Return -1 if O is winner
+//Returns 0 if no one won
+    fun utilityOf(boardState: BoardState): Int {
         for (a in 0..7) {
-            val line = checkState(state, a)
+            val line = checkState(boardState, a)
             //Check for Winners
             if (line == "XXX") {
-                return 1
+                return 10
             } else if (line == "OOO") {
-                return -1
+                return -10
             }
         }
         return 0
     }
 
     //Find any win state if it exists
-    private fun checkState(state: State, a: Int): String {
+    private fun checkState(boardState: BoardState, a: Int): String {
         return when (a) {
-            0 -> state.getStateIndex(0) + state.getStateIndex(1) + state.getStateIndex(2)
-            1 -> state.getStateIndex(3) + state.getStateIndex(4) + state.getStateIndex(5)
-            2 -> state.getStateIndex(6) + state.getStateIndex(7) + state.getStateIndex(8)
-            3 -> state.getStateIndex(0) + state.getStateIndex(3) + state.getStateIndex(6)
-            4 -> state.getStateIndex(1) + state.getStateIndex(4) + state.getStateIndex(7)
-            5 -> state.getStateIndex(2) + state.getStateIndex(5) + state.getStateIndex(8)
-            6 -> state.getStateIndex(0) + state.getStateIndex(4) + state.getStateIndex(8)
-            7 -> state.getStateIndex(2) + state.getStateIndex(4) + state.getStateIndex(6)
+            0 -> boardState.getStateIndex(0) + boardState.getStateIndex(1) + boardState.getStateIndex(
+                2
+            )
+
+            1 -> boardState.getStateIndex(3) + boardState.getStateIndex(4) + boardState.getStateIndex(
+                5
+            )
+
+            2 -> boardState.getStateIndex(6) + boardState.getStateIndex(7) + boardState.getStateIndex(
+                8
+            )
+
+            3 -> boardState.getStateIndex(0) + boardState.getStateIndex(3) + boardState.getStateIndex(
+                6
+            )
+
+            4 -> boardState.getStateIndex(1) + boardState.getStateIndex(4) + boardState.getStateIndex(
+                7
+            )
+
+            5 -> boardState.getStateIndex(2) + boardState.getStateIndex(5) + boardState.getStateIndex(
+                8
+            )
+
+            6 -> boardState.getStateIndex(0) + boardState.getStateIndex(4) + boardState.getStateIndex(
+                8
+            )
+
+            7 -> boardState.getStateIndex(2) + boardState.getStateIndex(4) + boardState.getStateIndex(
+                6
+            )
+
             else -> ""
         }
     }
 
     //Returns all possible states form a given state
-    private fun successorsOf(state: State): java.util.ArrayList<State> {
-        val possibleMoves = java.util.ArrayList<State>()
+    private fun successorsOf(boardState: BoardState): java.util.ArrayList<BoardState> {
+        val possibleMoves = java.util.ArrayList<BoardState>()
         var xMoves = 0
         var yMoves = 0
-        val player: String
 
         //Calculate player turn
-        for (s in state.state) {
+        for (s in boardState.board) {
             if (s == "X") {
                 xMoves++
             } else if (s == "O") {
                 yMoves++
             }
         }
-        player = if (xMoves <= yMoves) {
+        val player: String = if (xMoves < yMoves) {
             "X"
         } else {
             "O"
@@ -124,12 +211,13 @@ object Minimax {
 
         //Create all possible states
         for (i in 0..8) {
-            val newState = state.state.clone()
+            val newState = boardState.board.toMutableList()
             if (newState[i] !== "X" && newState[i] !== "O") {
                 newState[i] = player
-                possibleMoves.add(State(i, newState))
+                possibleMoves.add(BoardState(i, newState))
             }
         }
+        Log.i("Minimax", "successorsOf: $possibleMoves")
         return possibleMoves
     }
 }

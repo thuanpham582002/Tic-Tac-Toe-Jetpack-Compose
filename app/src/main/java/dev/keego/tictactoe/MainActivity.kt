@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,6 +32,7 @@ import dev.keego.tictactoe.ui.theme.TicTacToeTheme
 class MainActivity : ComponentActivity() {
     private val mainViewModel by viewModels<MainViewModel>()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -40,45 +43,44 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val state by mainViewModel.state.collectAsState()
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier.fillMaxHeight()
-                    ) {
-                        ButtonGrid(
-                            board = state.board
-                        ) { cell ->
-                            mainViewModel.placeMove(cell, mainViewModel.currentPlayer.value)
-                        }
+                    Scaffold(
+                        topBar = {
+                            TicTacAppBar(state.isSinglePlayer,
+                                state.isHard,
+                                onModeChange = {
+                                    mainViewModel.updateState(
+                                        state.copy(
+                                            isSinglePlayer = it
+                                        )
+                                    )
+                                },
+                                onDifficultyChange = {
+                                    mainViewModel.updateState(
+                                        state.copy(
+                                            isHard = it
+                                        )
+                                    )
+                                })
+                        }) { paddingValues ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround,
+                        ) {
+                            ButtonGrid(
+                                board = state.boardState.board,
+                                onclick = mainViewModel::play,
+                            )
 
-                        if (mainViewModel.isGameOver) {
-                            Box {
+                            if (state.isGameOver) {
                                 Text(
-                                    text = "Game is Over: ${mainViewModel.winner}",
+                                    text = "Game is Over: ${state.winner} wins",
                                     fontSize = 20.sp
                                 )
                             }
-                        }
-
-                        ResetButton(onClick = mainViewModel::resetGame)
-
-                        //Play with a friend
-                        TextButton(
-                            onClick = {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Coming soon",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            },
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(50.dp),
-                        ) {
-                            Text(
-                                text = "Play with a friend",
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                            ResetButton(onClick = mainViewModel::resetGame)
                         }
                     }
                 }

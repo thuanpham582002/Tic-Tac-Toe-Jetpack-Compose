@@ -1,21 +1,21 @@
 package dev.keego.tictactoe
 
-import java.util.Arrays
-
-class State(var position: Int, var state: Array<String>) {
+class BoardState(var position: Int, var board: List<String>) {
 
     fun getStateIndex(i: Int): String {
-        return state[i]
+        return board[i]
     }
 
     fun changeState(i: Int, player: String) {
-        state[i] = player
+        board = board.toMutableList().apply {
+            set(i, player)
+        }
     }
 
     override fun toString(): String {
         return "dev.keego.tictactoe.State{" +
                 "position=" + position +
-                ", state=" + Arrays.toString(state) +
+                ", state=" + board.toTypedArray().contentToString() +
                 '}'
     }
 }
