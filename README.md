@@ -1,5 +1,5 @@
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github. com/thuanpham582002/tictactoe/blob/main/README.md)
-[![es](https://img.shields.io/badge/lang-vn-yellow.svg)](https://github. com/thuanpham582002/tictactoe/blob/main/README.vn.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/thuanpham582002/tictactoe/blob/main/README.md)
+[![vn](https://img.shields.io/badge/lang-vn-yellow.svg)](https://github.com/thuanpham582002/tictactoe/blob/main/README.vn.md)
 # Tic-Tac-Toe Game with AI Bot (using Minimax algorithm)
 ## Project Description
 This project is a Tic-Tac-Toe game developed for Android, using Jetpack Compose for user interface
