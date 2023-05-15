@@ -54,7 +54,7 @@ object Minimax {
 //        return 0
     }
 
-    fun minimax(boardState: BoardState, depth: Int, isMaximizingPlayer: Boolean): Int {
+    private fun minimax(boardState: BoardState, depth: Int, isMaximizingPlayer: Boolean): Int {
         if (isTerminal(boardState)) {
             val score = utilityOf(boardState)
             if (score == 10) {

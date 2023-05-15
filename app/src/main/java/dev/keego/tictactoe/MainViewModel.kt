@@ -1,14 +1,7 @@
 package dev.keego.tictactoe
 
-import androidx.lifecycle.viewModelScope
 import dev.keego.tictactoe.state.State
 import dev.keego.tictactoe.state.VimelStateHolder
-import kotlinx.coroutines.launch
-
-data class Cell(val i: Int, val j: Int)
-enum class Difficulty {
-    EASY, HARD
-}
 
 class MainViewModel : VimelStateHolder<MainViewModel.MainViewModelState>(MainViewModelState()) {
     companion object {
@@ -69,14 +62,14 @@ class MainViewModel : VimelStateHolder<MainViewModel.MainViewModelState>(MainVie
         }
         if (Minimax.isTerminal(currentState.boardState)) {
             when (Minimax.utilityOf(currentState.boardState)) {
-                1 -> update {
+                10 -> update {
                     it.copy(
                         isGameOver = true,
                         winner = COMPUTER
                     )
                 }
 
-                -1 -> update {
+                -10 -> update {
                     it.copy(
                         isGameOver = true,
                         winner = PLAYER
