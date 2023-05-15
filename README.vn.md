@@ -1,3 +1,6 @@
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/thuanpham582002/tictactoe/blob/main/README.md)
+[![vn](https://img.shields.io/badge/lang-vn-yellow.svg)](https://github.com/thuanpham582002/tictactoe/blob/main/README.vn.md)
+
 # Tic-Tac-Toe Game với Bot AI (sử dụng thuật toán Minimax)
 
 ## Mô tả Dự án
